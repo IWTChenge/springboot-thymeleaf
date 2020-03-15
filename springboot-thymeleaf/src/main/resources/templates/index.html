@@ -4,7 +4,56 @@
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
 </head>
 <body>
-<p th:text="'用户ID：' + ${user.getId()}" />
-<p th:text="'用户名称：' + ${user.getName()}"/>
+<ol>
+    <li>List循环：
+        <table border="1">
+            <tr>
+                <th>用户ID</th>
+                <th>用户名</th>
+                <th>手机号</th>
+                <th>邮箱</th>
+                <th>锁定</th>
+                <th>创建时间</th>
+                <th>修改日期</th>
+
+                <th>状态变量：index</th>
+                <th>状态变量：count</th>
+                <th>状态变量：size</th>
+                <th>状态变量：current.userName</th>
+                <th>状态变量：even</th>
+                <th>状态变量：odd</th>
+                <th>状态变量：first</th>
+                <th>状态变量：last</th>
+            </tr>
+            <tr  th:each="student,userStat : ${ls}">
+                <td th:text="${student.student_id}">Onions</td>
+                <td th:text="${student.name}">test@test.com.cn</td>
+                <td th:text="${student.phone}">yes</td>
+                <td th:text="${student.email}">yes</td>
+                <td th:text="${student.locked}">yes</td>
+                <td th:text="${student.gmt_created}">yes</td>
+                <td th:text="${student.gmt_modified}">yes</td>
+                <th th:text="${userStat.index}">状态变量：index</th>
+                <th th:text="${userStat.count}">状态变量：count</th>
+                <th th:text="${userStat.size}">状态变量：size</th>
+                <th th:text="${userStat.current.name}">状态变量：current</th>
+                <th th:text="${userStat.even}">状态变量：even****</th>
+                <th th:text="${userStat.odd}">状态变量：odd</th>
+                <th th:text="${userStat.first}">状态变量：first</th>
+                <th th:text="${userStat.last}">状态变量：last</th>
+            </tr>
+        </table>
+    </li>
+<!--    <li>Map循环：-->
+<!--        <div th:each="mapS:${map}">-->
+<!--            <div th:text="${mapS}"></div>-->
+<!--        </div>-->
+<!--    </li>-->
+<!--    <li>数组循环：-->
+<!--        <div th:each="arrayS:${arrays}">-->
+<!--            <div th:text="${arrayS}"></div>-->
+<!--        </div>-->
+<!--    </li>-->
+</ol>
 </body>
 </html>
