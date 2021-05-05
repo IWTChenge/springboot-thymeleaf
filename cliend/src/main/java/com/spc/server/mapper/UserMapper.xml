@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.spc.server.dao.UserDao">
+
+    <resultMap id="userResultMap" type="com.spc.server.pojo.User">
+        <id property="userId" column="userid"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="email" column="email"/>
+        <result property="registerTime" column="registerTime" javaType="Date"/>
+        <result property="salt" column="salt"/>
+        <result property="state" column="state"/>
+        <collection property="roleList" ofType="com.spc.server.pojo.SysRole" column="id" select="selectRole"/>
+
+    </resultMap>
+    <resultMap id="tokenResultMap" type="com.spc.server.pojo.AuthToken">
+        <id property="id" column="id"/>
+        <result property="token" column="token"/>
+        <result property="userId" column="userId"/>
+        <result property="expireTime" column="expireTime" javaType="Long" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="uodataTime" javaType="Long" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="selectRole" resultType="com.spc.server.pojo.SysRole">
+        select * from sys_role
+        where id=#{id}
+    </select>
+    <insert id="addUser" useGeneratedKeys="true" keyColumn="userId">
+        insert into user(username,password,email) values
+        <!--        collection="array/list"-->
+        <foreach item="item" collection="array" separator=",">
+            (#{item.username}, #{item.password}, #{item.email})
+        </foreach>
+    </insert>
+    <insert id="addOneUser" parameterType="com.spc.server.pojo.User" useGeneratedKeys="true" keyColumn="userId">
+        <!--        <selectKey keyProperty="userId" resultType="int" order="AFTER">-->
+        <!--            select userId  from user where username=#{username}-->
+        <!--        </selectKey>-->
+        insert into user(username,password,email)
+        values(#{username},#{password},#{email})
+    </insert>
+    <update id="save" parameterType="com.spc.server.pojo.AuthToken" useGeneratedKeys="true" keyColumn="id">
+        update sys_auth set token=#{token}, expireTime=#{expireTime} where userId=#{userId}
+    </update>
+    <update id="update">
+
+    </update>
+    <update id="updateExpireTime">
+        update sys_auth set uodataTime=#{updateTime} where token=#{token}
+    </update>
+    <update id="cleanToken">
+        update sys_auth set token="" where token=#{token}
+    </update>
+    <delete id="DeleteUser">
+        delete from user where userId = #{userId}
+    </delete>
+    <select id="getAllUser" resultType="com.spc.server.pojo.User">
+        select * from user
+    </select>
+    <select id="searchUser" resultType="com.spc.server.pojo.User">
+        select * from user
+        <where>
+            <if test="username!=null and username!=''">
+                username=#{username}
+            </if>
+            <if test="password!=null and password!=''">
+                AND password=#{password}
+            </if>
+        </where>
+    </select>
+    <select id="verifyUser" resultType="com.spc.server.pojo.User">
+        select * from user
+        <where>
+            <if test="username!=null and username!=''">
+                username=#{username}
+            </if>
+            <if test="password!=null and password!=''">
+                AND password=#{password}
+            </if>
+        </where>
+    </select>
+    <select id="selectUser" resultType="com.spc.server.pojo.User">
+        select ${column} from user where userId=#{value}
+    </select>
+    <select id="selectByUserId" resultType="com.spc.server.pojo.User">
+        select * from user where userId=#{id}
+    </select>
+    <select id="selectByColumn" resultType="com.spc.server.pojo.User">
+        select * from user where ${column}=#{value}
+    </select>
+    <select id="findByToken" resultMap="tokenResultMap">
+        select * from sys_auth where token=#{accessToken}
+    </select>
+    <select id="searchUserByToken" resultType="com.spc.server.pojo.User">
+        select * from user where userId=(select userId from sys_auth where token =#{token})
+    </select>
+    <select id="getRoleByUid" resultType="java.lang.String">
+        select role from sys_role where id=(select role_id from sys_user_role where uid=#{userId} )
+    </select>
+    <select id="findPermissionByRole" resultType="java.lang.String">
+        select permission from sys_permission sp,sys_role_permission srp ,sys_role sr
+        where sp.id=srp.permission_id
+        and srp.role_id=sr.id
+        and sr.role in
+        <foreach item="item" index="index" collection="value"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

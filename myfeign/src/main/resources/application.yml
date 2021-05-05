@@ -1,0 +1,14 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+server:
+  port: 8766
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+      name: service-feign
+#  Feign有一个局限性，即对于同一个service-id只能使用一个配置类，
+#  如果有多个@FeignClient注解使用了相同的name属性，则注解的configuration参数会被覆盖.
+#不加 allow-bean-definition-overriding: true 会报错
